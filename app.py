@@ -40,7 +40,7 @@ with gr.Blocks() as demo:
     gr.HTML("""
         <div style="text-align: center; padding: 20px; background: linear-gradient(90deg, #1e3a8a, #3b82f6); border-radius: 10px; color: white;">
             <h1 style="margin: 0;">🧬 DNAProt Pro Analyzer</h1>
-            <p style="margin: 5px 0 0 0;">Advanced Genomic Analytics Dashboard | Vikas K R</p>
+            <p style="margin: 5px 0 0 0;">Advanced Genomic Analytics Dashboard | By Adisri Menon , Dhanush R M ,Vikas K R</p>
         </div>
     """)
 
