@@ -32,35 +32,38 @@ def analyze_sequence(file_obj):
 
         report_text = result.stdout
         
-        # --- FIXED PARSING STRINGS FOR METRIC BADGES ---
+        # --- DYNAMIC METRIC GENERATION ---
+        seq_len_val = 0
         seq_len = "0 bp"
-        gc_cont = "38.00 %"  # Hardcoded default fallback matching your current view
-        mol_wt = "0 kDa"
+        gc_cont = "0.00 %"
+        mol_wt = "0.00 kDa"
         
+        # 1. Extract Sequence Length from Bash stdout logs
         for line in report_text.split('\n'):
-            # Matches "Sequence Len" from your actual script log
             if "Sequence Len" in line:
-                try: seq_len = line.split(':')[1].strip()
-                except: pass
-            # Matches "GC Content" if your script outputs it on another line
-            if "GC Content" in line:
-                try: gc_cont = line.split(':')[1].strip()
-                except: pass
-            # Matches "Est. Mol. Weight" or similar protein descriptors
-            if "Est. Mol. Weight" in line or "Weight" in line:
-                try: mol_wt = line.split(':')[1].strip()
-                except: pass
+                try: 
+                    seq_len = line.split(':')[1].strip()
+                    seq_len_val = int(seq_len.split()[0])
+                except: 
+                    pass
 
-        # If GC content parsing isn't explicitly found, calculate a quick rough estimate from the log dynamically
-        if gc_cont == "38.00 %" and ("G:" in report_text and "C:" in report_text):
+        # 2. Extract or Dynamically Calculate GC Content from Nucleotide Counts
+        if "G:" in report_text and "C:" in report_text:
             try:
-                # Fallback calculation if needed: G+C / Total
                 g_val = int(report_text.split("G:")[1].split("|")[0].strip())
                 c_val = int(report_text.split("C:")[1].split("\n")[0].split("|")[0].strip())
-                total = int(seq_len.split()[0])
-                gc_cont = f"{round(((g_val + c_val) / total) * 100, 2)} %"
+                if seq_len_val > 0:
+                    gc_cont = f"{round(((g_val + c_val) / seq_len_val) * 100, 2)} %"
             except:
                 pass
+
+        # 3. Dynamic Protein Molecular Weight Calculation (Central Dogma Formula)
+        # Sequence Length / 3 = Amino Acids. Avg Amino Acid Weight = 110 Daltons.
+        if seq_len_val > 0:
+            amino_acids = seq_len_val / 3
+            weight_daltons = amino_acids * 110
+            weight_kda = weight_daltons / 1000
+            mol_wt = f"{round(weight_kda, 2)} kDa"
 
         # --- GENERATE PDF REPORT ---
         pdf_filename = "DNAProt_Analysis_Report.pdf"
