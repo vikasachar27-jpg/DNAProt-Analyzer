@@ -33,7 +33,6 @@ def analyze_sequence(file_obj):
         report_text = result.stdout
         
         # --- PARSING BASIC METRICS FOR VISUAL BADGES ---
-        # Pulls metrics dynamically from your script's output lines to feed the top badges
         seq_len = "0 bp"
         gc_cont = "0.00 %"
         mol_wt = "0 kDa"
@@ -77,11 +76,8 @@ def analyze_sequence(file_obj):
     except Exception as e:
         return f"❌ System Error: {str(e)}", None, "Error", "Error", "Error"
 
-# 3. GRADIO FRONTEND UI (UPGRADED STYLING)
-with gr.Blocks(css="""
-    .metric-box { background-color: #f0f4f8; border-left: 5px solid #3b82f6; padding: 12px; border-radius: 6px; text-align: center; }
-    .title-banner { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-""") as demo:
+# 3. GRADIO FRONTEND UI (CSS parameter removed from here)
+with gr.Blocks() as demo:
     
     # Elegant custom HTML Banner Header
     gr.HTML("""
@@ -103,7 +99,8 @@ with gr.Blocks(css="""
         badge_gc = gr.Textbox(label="GC Content Proportion", value="--", interactive=False, elem_classes=["metric-box"])
         badge_wt = gr.Textbox(label="Est. Protein Mass", value="--", interactive=False, elem_classes=["metric-box"])
 
-    gr.Spacer()
+    # Fixed: Replaced gr.Spacer() with a clean HTML line break component
+    gr.HTML("<br/>")
 
     # Tabbed Interface System
     with gr.Tabs():
@@ -146,9 +143,17 @@ with gr.Blocks(css="""
 # 4. RENDER DEPLOYMENT SETTINGS
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
+    
+    # Custom CSS defining styles for elements
+    custom_css = """
+        .metric-box { background-color: #f0f4f8; border-left: 5px solid #3b82f6; padding: 12px; border-radius: 6px; text-align: center; }
+        .title-banner { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    """
+    
     demo.launch(
         server_name="0.0.0.0", 
         server_port=port, 
         share=False,
         theme=gr.themes.Soft(),
+        css=custom_css  # ✅ Fixed: Custom CSS is now safely passed inside launch()
     )
