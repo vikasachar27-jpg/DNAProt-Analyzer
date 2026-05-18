@@ -47,18 +47,15 @@ def analyze_sequence(file_obj):
                 except: 
                     pass
 
-        # 2. Extract or Dynamically Calculate GC Content from Nucleotide Counts
-        if "G:" in report_text and "C:" in report_text:
-            try:
-                g_val = int(report_text.split("G:")[1].split("|")[0].strip())
-                c_val = int(report_text.split("C:")[1].split("\n")[0].split("|")[0].strip())
-                if seq_len_val > 0:
-                    gc_cont = f"{round(((g_val + c_val) / seq_len_val) * 100, 2)} %"
-            except:
-                pass
+        # 2. Extract GC Content Exactly as Printed by Bash Script
+        for line in report_text.split('\n'):
+            if "GC Content" in line:
+                try: 
+                    gc_cont = line.split(':')[1].strip()
+                except: 
+                    pass
 
         # 3. Dynamic Protein Molecular Weight Calculation (Central Dogma Formula)
-        # Sequence Length / 3 = Amino Acids. Avg Amino Acid Weight = 110 Daltons.
         if seq_len_val > 0:
             amino_acids = seq_len_val / 3
             weight_daltons = amino_acids * 110
