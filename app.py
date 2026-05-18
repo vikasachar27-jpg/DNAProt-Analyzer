@@ -76,7 +76,7 @@ def analyze_sequence(file_obj):
     except Exception as e:
         return f"❌ System Error: {str(e)}", None, "Error", "Error", "Error"
 
-# 3. GRADIO FRONTEND UI (CSS parameter removed from here)
+# 3. GRADIO FRONTEND UI 
 with gr.Blocks() as demo:
     
     # Elegant custom HTML Banner Header
@@ -99,7 +99,6 @@ with gr.Blocks() as demo:
         badge_gc = gr.Textbox(label="GC Content Proportion", value="--", interactive=False, elem_classes=["metric-box"])
         badge_wt = gr.Textbox(label="Est. Protein Mass", value="--", interactive=False, elem_classes=["metric-box"])
 
-    # Fixed: Replaced gr.Spacer() with a clean HTML line break component
     gr.HTML("<br/>")
 
     # Tabbed Interface System
@@ -116,8 +115,8 @@ with gr.Blocks() as demo:
                     output_text = gr.Textbox(
                         label="Console Terminal Raw Output", 
                         lines=16, 
-                        placeholder="Awaiting structural processing execution strings...",
-                        show_copy_button=True
+                        placeholder="Awaiting structural processing execution strings..."
+                        # ✅ Fixed: show_copy_button removed because it is deprecated in Gradio 6.0
                     )
         
         with gr.TabItem("📥 Data Export Center"):
@@ -144,7 +143,6 @@ with gr.Blocks() as demo:
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     
-    # Custom CSS defining styles for elements
     custom_css = """
         .metric-box { background-color: #f0f4f8; border-left: 5px solid #3b82f6; padding: 12px; border-radius: 6px; text-align: center; }
         .title-banner { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
@@ -155,5 +153,5 @@ if __name__ == "__main__":
         server_port=port, 
         share=False,
         theme=gr.themes.Soft(),
-        css=custom_css  # ✅ Fixed: Custom CSS is now safely passed inside launch()
+        css=custom_css
     )
